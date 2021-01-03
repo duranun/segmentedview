@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.duranun.library.SegmentedView
+        android:id="@+id/segment"
+        android:elevation="3dp"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_margin="5dp"
+        android:background="@drawable/segment_view_bg"
+        app:segmentItemBackground="@drawable/segment_item_view_bg"
+        app:labelTextSize="16sp"
+        app:defaultSelectedIndex="0"
+        app:itemMargins="3dp"
+        app:labelTextColor="#000000"
+        app:selectedTextColor="@color/white"
+        />
+    <TextView
+        android:id="@+id/selectionText"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center"
+        android:text=""
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

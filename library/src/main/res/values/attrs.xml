@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SegmentedView">
+        <attr name="segmentItemBackground" format="reference" />
+        <attr name="defaultSelectedIndex" format="integer" />
+        <attr name="labelTextColor" format="reference|color" />
+        <attr name="selectedTextColor" format="reference|color" />
+        <attr name="labelTextSize" format="dimension" />
+        <attr name="itemMargins" format="dimension" />
+    </declare-styleable>
+</resources>
