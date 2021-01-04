@@ -82,6 +82,7 @@ class SegmentedView : FrameLayout {
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, labelFontSize.toFloat())
             textView.setTextColor(labelTextColor)
             textView.setOnClickListener {
+                if (currentSelection == index) return@setOnClickListener
                 currentSelection = index
                 val item = labelContainers[index]
                 tag = index
