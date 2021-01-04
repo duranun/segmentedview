@@ -27,7 +27,7 @@ class SegmentedView : FrameLayout {
     private var selectedTextColor: Int = Color.rgb(0, 0, 0)
     private var margins: Int = 0
     private var selectedIndex: Int = 0
-    private var currentSelection: Int = 0
+    private var currentSelection: Int = selectedIndex
     private var segmentItems: Array<String> = arrayOf()
     private var segmentItemBackground: Drawable? = ColorDrawable(Color.rgb(0, 0, 0))
 
