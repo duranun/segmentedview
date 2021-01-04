@@ -106,6 +106,7 @@ class SegmentedView : FrameLayout {
         if (labelContainers.childCount == 0) return
         val selectedItem = labelContainers[selectedIndex]
         selectedItem.post {
+            currentSelection = selectedIndex
             (selectedItem as TextView).setTextColor(selectedTextColor)
             val x = selectedItem.x
             selectionBar.x = x
