@@ -22,6 +22,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.children
 import androidx.core.view.forEach
+import androidx.core.view.forEachIndexed
 import androidx.core.view.get
 
 class SegmentedView : FrameLayout {
@@ -88,17 +89,22 @@ class SegmentedView : FrameLayout {
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, labelFontSize.toFloat())
             textView.setTextColor(labelTextColor)
             textView.setOnClickListener {
-                if (currentSelection == index) return@setOnClickListener
-                currentSelection = index
-                val item = labelContainers[index]
-                tag = index
-                selectionBar.animate().translationX(item.x)
-                    .setListener(animationListener)
+                animateAndSetCurrent(index)
             }
             labelContainers.addView(textView)
         }
         addView(labelContainers)
         addItemSelector()
+    }
+
+    private fun animateAndSetCurrent(index: Int) {
+        if (currentSelection == index) return
+        val item = labelContainers[index]
+        tag = index
+        currentSelection = index
+        selectionBar.animate().translationX(item.x)
+            .setListener(animationListener)
+        Log.e("click","again")
     }
 
     private fun deselectAllItems() {
@@ -119,7 +125,6 @@ class SegmentedView : FrameLayout {
         }
         labelContainers.bringToFront()
     }
-
 
     private fun addItemSelector() {
         selectionBar = View(context)
@@ -167,7 +172,7 @@ class SegmentedView : FrameLayout {
         addLabels()
     }
 
-    private  var target: Float = 0f
+    private var target: Float = 0f
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         ev?.let {
             Log.e("action", "${ev.actionMasked}")
@@ -183,8 +188,8 @@ class SegmentedView : FrameLayout {
                     }
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (labelContainers.childCount > 0) {
-                        labelContainers.forEach { view ->
+                        if (labelContainers.childCount > 0 && ev.eventTime - ev.downTime > CLICK_DURATION) {
+                        labelContainers.forEachIndexed { index, view ->
                             val viewRect =
                                 RectF(
                                     view.x,
@@ -199,8 +204,8 @@ class SegmentedView : FrameLayout {
                                 selectionBar.y + selectionBar.height
                             )
                             if (viewRect.contains(targetRect)) {
-                                view.callOnClick()
-                                return@forEach
+                                animateAndSetCurrent(index)
+                                return@forEachIndexed
                             }
                         }
                         selectionBar.animate()
@@ -216,7 +221,6 @@ class SegmentedView : FrameLayout {
     companion object {
         private const val CLICK_DURATION = 100
     }
-
 
 }
 
