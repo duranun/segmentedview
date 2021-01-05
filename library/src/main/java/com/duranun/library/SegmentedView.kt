@@ -4,18 +4,24 @@ import android.animation.Animator
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.children
+import androidx.core.view.forEach
 import androidx.core.view.get
 
 class SegmentedView : FrameLayout {
@@ -161,7 +167,59 @@ class SegmentedView : FrameLayout {
         addLabels()
     }
 
+    private  var target: Float = 0f
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        ev?.let {
+            Log.e("action", "${ev.actionMasked}")
+            when (it.action) {
+
+                MotionEvent.ACTION_MOVE -> {
+                    if (ev.eventTime - ev.downTime > CLICK_DURATION) {
+                        val point = ev.rawX - (selectionBar.width / 2)
+                        if (point > (x - margins) && (point + selectionBar.width) < (right - (margins * 2))) {
+                            selectionBar.x = point
+                            target = point
+                        }
+                    }
+                }
+                MotionEvent.ACTION_UP -> {
+                    if (labelContainers.childCount > 0) {
+                        labelContainers.forEach { view ->
+                            val viewRect =
+                                RectF(
+                                    view.x,
+                                    view.y,
+                                    view.x + view.width,
+                                    view.y + view.height
+                                )
+                            val targetRect = RectF(
+                                target + ((selectionBar.width / 2) + margins),
+                                selectionBar.y,
+                                target + ((selectionBar.width / 2) + margins),
+                                selectionBar.y + selectionBar.height
+                            )
+                            if (viewRect.contains(targetRect)) {
+                                view.callOnClick()
+                                return@forEach
+                            }
+                        }
+                        selectionBar.animate()
+                            .translationX(labelContainers[currentSelection].x)
+                    }
+
+                }
+            }
+        }
+        return super.onInterceptTouchEvent(ev)
+    }
+
+    companion object {
+        private const val CLICK_DURATION = 100
+    }
+
+
 }
+
 
 private fun Int.toPx(): Float {
     val density = Resources.getSystem().displayMetrics.density
