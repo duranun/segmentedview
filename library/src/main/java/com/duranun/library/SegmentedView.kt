@@ -4,11 +4,9 @@ import android.animation.Animator
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.text.style.ClickableSpan
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
@@ -23,7 +21,6 @@ import android.widget.TextView
 import androidx.core.view.children
 import androidx.core.view.forEachIndexed
 import androidx.core.view.get
-import kotlin.math.abs
 
 
 class SegmentedView : FrameLayout {
