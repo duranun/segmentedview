@@ -87,6 +87,7 @@ class SegmentedView : FrameLayout {
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, labelFontSize.toFloat())
             textView.setTextColor(labelTextColor)
             textView.setOnClickListener {
+                it.tag = index
                 animateAndSetCurrent(index)
             }
             labelContainers.addView(textView)
@@ -115,10 +116,7 @@ class SegmentedView : FrameLayout {
         if (labelContainers.childCount == 0) return
         val selectedItem = labelContainers[selectedIndex]
         selectedItem.post {
-            currentSelection = selectedIndex
-            (selectedItem as TextView).setTextColor(selectedTextColor)
-            val x = selectedItem.x
-            selectionBar.x = x
+            labelContainers[selectedIndex].callOnClick()
         }
         labelContainers.bringToFront()
     }
@@ -191,20 +189,7 @@ class SegmentedView : FrameLayout {
                 MotionEvent.ACTION_UP -> {
                     if (labelContainers.childCount > 0 && ev.eventTime - ev.downTime > CLICK_DURATION) {
                         labelContainers.forEachIndexed { index, view ->
-                            val viewRect =
-                                RectF(
-                                    view.x,
-                                    view.y,
-                                    view.x + view.measuredWidth,
-                                    view.y + view.measuredWidth
-                                )
-                            val targetRect = RectF(
-                                target + (selectionBar.width / 2),
-                                selectionBar.y,
-                                target + (selectionBar.width / 2),
-                                selectionBar.y + selectionBar.height
-                            )
-                            if (viewRect.contains(targetRect)) {
+                             if(target >(view.left/2) && target<view.right){
                                 animateAndSetCurrent(index)
                                 return@forEachIndexed
                             }
@@ -220,7 +205,7 @@ class SegmentedView : FrameLayout {
     }
 
     companion object {
-        private const val CLICK_DURATION = 100
+        private const val CLICK_DURATION = 200
     }
 }
 

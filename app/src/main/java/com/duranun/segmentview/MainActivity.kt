@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         segmentedView = findViewById(R.id.segment)
         selectionTv = findViewById(R.id.selectionText)
-        segmentedView.setItemsList(arrayOf("Tab1", "Tab2","test2"))
+        segmentedView.setItemsList(arrayOf("Moped", "Marti"))
         segmentedView.setOnSelectionListener { view, selectedIndex ->
             val tv = view as TextView
             selectionTv.text =
