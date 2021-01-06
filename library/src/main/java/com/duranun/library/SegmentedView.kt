@@ -205,8 +205,7 @@ class SegmentedView : FrameLayout {
                                 selectionBar.x+selectionBar.width ,
                                 selectionBar.y + selectionBar.height
                             )
-                            if (viewRect.contains(targetRect)) {
-
+                            if (targetRect.right>viewRect.centerX()) {
                                 animateAndSetCurrent(index)
                                 return@forEachIndexed
                             }
