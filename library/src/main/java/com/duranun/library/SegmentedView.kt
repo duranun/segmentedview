@@ -200,9 +200,9 @@ class SegmentedView : FrameLayout {
                                     view.y + view.measuredWidth
                                 )
                             val targetRect = RectF(
-                                selectionBar.x+(selectionBar.width/2) ,
+                                selectionBar.x ,
                                 selectionBar.y,
-                                selectionBar.x+(selectionBar.width/2) ,
+                                selectionBar.x+selectionBar.width ,
                                 selectionBar.y + selectionBar.height
                             )
                             if (viewRect.contains(targetRect)) {
