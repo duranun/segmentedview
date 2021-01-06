@@ -4,10 +4,13 @@ import android.animation.Animator
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.text.style.ClickableSpan
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.MotionEvent
@@ -20,6 +23,7 @@ import android.widget.TextView
 import androidx.core.view.children
 import androidx.core.view.forEachIndexed
 import androidx.core.view.get
+import kotlin.math.abs
 
 
 class SegmentedView : FrameLayout {
@@ -97,10 +101,14 @@ class SegmentedView : FrameLayout {
     }
 
     private fun animateAndSetCurrent(index: Int) {
-        if (currentSelection == index) return
+        if (currentSelection == index) {
+            Log.e("isClick", "false")
+            return
+        }
         val item = labelContainers[index]
         tag = index
         currentSelection = index
+        Log.e("isClick", "true")
         selectionBar.animate().translationX(item.x)
             .setListener(animationListener)
     }
@@ -172,6 +180,7 @@ class SegmentedView : FrameLayout {
 
     private var target: Float = 0f
     private var dX: Float = 0f
+
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         ev?.let {
             when (it.action) {
@@ -200,24 +209,24 @@ class SegmentedView : FrameLayout {
                                     view.y + view.measuredWidth
                                 )
                             val targetRect = RectF(
-                                selectionBar.x ,
+                                selectionBar.x +(selectionBar.width/2),
                                 selectionBar.y,
-                                selectionBar.x+selectionBar.width ,
+                                selectionBar.x+(selectionBar.width/2),
                                 selectionBar.y + selectionBar.height
                             )
-                            if (targetRect.right>viewRect.centerX()) {
+                            if (viewRect.contains(targetRect)) {
                                 animateAndSetCurrent(index)
                                 return@forEachIndexed
                             }
                         }
                         selectionBar.animate()
                             .translationX(labelContainers[currentSelection].x)
+                        return true
                     }
-
                 }
             }
         }
-        return super.onInterceptTouchEvent(ev)
+        return false
     }
 
     companion object {
