@@ -8,7 +8,6 @@ import android.graphics.RectF
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.MotionEvent
@@ -103,7 +102,6 @@ class SegmentedView : FrameLayout {
         currentSelection = index
         selectionBar.animate().translationX(item.x)
             .setListener(animationListener)
-        Log.e("click", "again")
     }
 
     private fun deselectAllItems() {
@@ -183,12 +181,7 @@ class SegmentedView : FrameLayout {
                 MotionEvent.ACTION_MOVE -> {
                     if (ev.eventTime - ev.downTime > CLICK_DURATION) {
                         val point = ev.rawX + dX
-
                         if (point > margins && point + selectionBar.measuredWidth < measuredWidth - margins) {
-                            Log.e(
-                                "points",
-                                "point:${point + selectionBar.measuredWidth}, right: $measuredWidth"
-                            )
                             selectionBar.x = point
                             target = point
                         }
@@ -206,9 +199,9 @@ class SegmentedView : FrameLayout {
                                     view.y + view.measuredWidth
                                 )
                             val targetRect = RectF(
-                                target+(selectionBar.width/2),
+                                target + (selectionBar.width / 2),
                                 selectionBar.y,
-                                target + (selectionBar.width/2),
+                                target + (selectionBar.width / 2),
                                 selectionBar.y + selectionBar.height
                             )
                             if (viewRect.contains(targetRect)) {
@@ -229,8 +222,6 @@ class SegmentedView : FrameLayout {
     companion object {
         private const val CLICK_DURATION = 100
     }
-
-
 }
 
 private fun Int.toPx(): Float {
