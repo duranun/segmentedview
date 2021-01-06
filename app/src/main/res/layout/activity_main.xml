@@ -15,7 +15,7 @@
         android:background="@drawable/segment_view_bg"
         app:segmentItemBackground="@drawable/segment_item_view_bg"
         app:labelTextSize="16sp"
-        app:defaultSelectedIndex="2"
+        app:defaultSelectedIndex="1"
         app:itemMargins="3dp"
         app:labelTextColor="#000000"
         app:selectedTextColor="@color/white"
