@@ -189,7 +189,21 @@ class SegmentedView : FrameLayout {
                 MotionEvent.ACTION_UP -> {
                     if (labelContainers.childCount > 0 && ev.eventTime - ev.downTime > CLICK_DURATION) {
                         labelContainers.forEachIndexed { index, view ->
-                             if(target >(view.left/2) && target<view.right){
+                            val viewRect =
+                                RectF(
+                                    view.x,
+                                    view.y,
+                                    view.x + view.measuredWidth,
+                                    view.y + view.measuredWidth
+                                )
+                            val targetRect = RectF(
+                                selectionBar.x+(selectionBar.width/2) ,
+                                selectionBar.y,
+                                selectionBar.x+(selectionBar.width/2) ,
+                                selectionBar.y + selectionBar.height
+                            )
+                            if (viewRect.contains(targetRect)) {
+
                                 animateAndSetCurrent(index)
                                 return@forEachIndexed
                             }
