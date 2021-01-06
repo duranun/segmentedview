@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -19,11 +18,10 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.view.children
-import androidx.core.view.forEach
 import androidx.core.view.forEachIndexed
 import androidx.core.view.get
+
 
 class SegmentedView : FrameLayout {
     private lateinit var selectionListener: (view: View, selectedIndex: Int) -> Unit
@@ -80,6 +78,7 @@ class SegmentedView : FrameLayout {
         labelContainers.orientation = LinearLayout.HORIZONTAL
         val params = LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
         labelContainers.layoutParams = params
+        labelContainers.weightSum = segmentItems.size.toFloat()
         segmentItems.forEachIndexed { index, text ->
             val textView = TextView(context)
             val textParams = LinearLayout.LayoutParams(0, MATCH_PARENT, 1f)
@@ -104,7 +103,7 @@ class SegmentedView : FrameLayout {
         currentSelection = index
         selectionBar.animate().translationX(item.x)
             .setListener(animationListener)
-        Log.e("click","again")
+        Log.e("click", "again")
     }
 
     private fun deselectAllItems() {
@@ -132,7 +131,7 @@ class SegmentedView : FrameLayout {
         itemParams.setMargins(margins, margins, margins, margins)
         if (labelContainers.childCount == 0) return
         labelContainers[currentSelection].post {
-            val selectorWidth = width / segmentItems.size
+            val selectorWidth = measuredWidth / segmentItems.size
             itemParams.width = selectorWidth - (margins * 2)
             selectionBar.layoutParams = itemParams
         }
@@ -173,34 +172,43 @@ class SegmentedView : FrameLayout {
     }
 
     private var target: Float = 0f
+    private var dX: Float = 0f
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         ev?.let {
-            Log.e("action", "${ev.actionMasked}")
             when (it.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    dX = selectionBar.x - it.rawX
+                }
 
                 MotionEvent.ACTION_MOVE -> {
                     if (ev.eventTime - ev.downTime > CLICK_DURATION) {
-                        val point = ev.rawX - (selectionBar.width / 2)
-                        if (point > (x - margins) && (point + selectionBar.width) < (right - (margins * 2))) {
+                        val point = ev.rawX + dX
+
+                        if (point > margins && point + selectionBar.measuredWidth < measuredWidth - margins) {
+                            Log.e(
+                                "points",
+                                "point:${point + selectionBar.measuredWidth}, right: $measuredWidth"
+                            )
                             selectionBar.x = point
                             target = point
                         }
+
                     }
                 }
                 MotionEvent.ACTION_UP -> {
-                        if (labelContainers.childCount > 0 && ev.eventTime - ev.downTime > CLICK_DURATION) {
+                    if (labelContainers.childCount > 0 && ev.eventTime - ev.downTime > CLICK_DURATION) {
                         labelContainers.forEachIndexed { index, view ->
                             val viewRect =
                                 RectF(
                                     view.x,
                                     view.y,
-                                    view.x + view.width,
-                                    view.y + view.height
+                                    view.x + view.measuredWidth,
+                                    view.y + view.measuredWidth
                                 )
                             val targetRect = RectF(
-                                target + ((selectionBar.width / 2) + margins),
+                                target+(selectionBar.width/2),
                                 selectionBar.y,
-                                target + ((selectionBar.width / 2) + margins),
+                                target + (selectionBar.width/2),
                                 selectionBar.y + selectionBar.height
                             )
                             if (viewRect.contains(targetRect)) {
@@ -222,8 +230,8 @@ class SegmentedView : FrameLayout {
         private const val CLICK_DURATION = 100
     }
 
-}
 
+}
 
 private fun Int.toPx(): Float {
     val density = Resources.getSystem().displayMetrics.density
