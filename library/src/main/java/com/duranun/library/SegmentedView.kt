@@ -4,7 +4,7 @@ import android.animation.Animator
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.RectF
+import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
@@ -98,14 +98,10 @@ class SegmentedView : FrameLayout {
     }
 
     private fun animateAndSetCurrent(index: Int) {
-        if (currentSelection == index) {
-            Log.e("isClick", "false")
-            return
-        }
+        if (currentSelection == index) return
         val item = labelContainers[index]
-        tag = index
+        item.tag = index
         currentSelection = index
-        Log.e("isClick", "true")
         selectionBar.animate().translationX(item.x)
             .setListener(animationListener)
     }
@@ -177,41 +173,39 @@ class SegmentedView : FrameLayout {
 
     private var target: Float = 0f
     private var dX: Float = 0f
+    private var readyForMove: Boolean = true
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         ev?.let {
             when (it.action) {
                 MotionEvent.ACTION_DOWN -> {
                     dX = selectionBar.x - it.rawX
+                    val selectedView = labelContainers.getChildAt(currentSelection)
+                    val selectedRect = Rect()
+                    selectedView.getHitRect(selectedRect)
+                    readyForMove = selectedRect.contains(it.x.toInt(),it.y.toInt())
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    if (ev.eventTime - ev.downTime > CLICK_DURATION) {
+                    Log.e("readyForMove", "selected: $currentSelection, $readyForMove")
+                    if (ev.eventTime - ev.downTime > CLICK_DURATION && readyForMove) {
                         val point = ev.rawX + dX
                         if (point > margins && point + selectionBar.measuredWidth < measuredWidth - margins) {
                             selectionBar.x = point
                             target = point
                         }
-
+                        val selectedView = labelContainers.getChildAt(currentSelection)
+                        val selectedRect = Rect()
+                        selectedView.getHitRect(selectedRect)
                     }
                 }
+
                 MotionEvent.ACTION_UP -> {
-                    if (labelContainers.childCount > 0 && ev.eventTime - ev.downTime > CLICK_DURATION) {
+                    if (labelContainers.childCount > 0 && ev.eventTime - ev.downTime > CLICK_DURATION && readyForMove) {
                         labelContainers.forEachIndexed { index, view ->
-                            val viewRect =
-                                RectF(
-                                    view.x,
-                                    view.y,
-                                    view.x + view.measuredWidth,
-                                    view.y + view.measuredWidth
-                                )
-                            val targetRect = RectF(
-                                selectionBar.x +(selectionBar.width/2),
-                                selectionBar.y,
-                                selectionBar.x+(selectionBar.width/2),
-                                selectionBar.y + selectionBar.height
-                            )
-                            if (viewRect.contains(targetRect)) {
+                            val viewRect = Rect()
+                            view.getHitRect(viewRect)
+                            if (viewRect.contains(it.x.toInt(),it.y.toInt()) ){
                                 animateAndSetCurrent(index)
                                 return@forEachIndexed
                             }
